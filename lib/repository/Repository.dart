@@ -34,6 +34,14 @@ class Repository {
     }
   }
 
+  Future removeData() async {
+    final path = await _localPath;
+    final dir = Directory('$path/$DATA_NAME');
+    if (await dir.exists()) {
+      await dir.delete(recursive: true);
+    }
+  }
+
   Future extractOffline() async {
     final path = await _localPath;
     List<int> bytes = File('$path/$DATA_NAME.zip').readAsBytesSync();
@@ -63,6 +71,6 @@ class Repository {
     }
 
     // get file index
-    return  File('$path/$DATA_NAME/index.html').path;
+    return File('$path/$DATA_NAME/index.html').path;
   }
 }

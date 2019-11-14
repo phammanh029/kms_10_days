@@ -1,3 +1,4 @@
+import 'package:ai_touch_10_days/app.bloc.dart';
 import 'package:ai_touch_10_days/repository/Repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
@@ -12,10 +13,15 @@ abstract class HomeEvent extends Equatable {
 
 class HomeEventStartup extends HomeEvent {}
 
+class HomeEventRemoveData extends HomeEvent {}
+
 class HomeEventDownloadOffline extends HomeEvent {
   final String url;
 
-  HomeEventDownloadOffline(this.url);
+  const HomeEventDownloadOffline(this.url);
+
+  @override
+  List<Object> get props => [url];
 }
 
 // STATE
@@ -55,8 +61,9 @@ class HomeStateError extends HomeState {
 // BLOC
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final Repository repository;
+  final AppBloc appBloc;
 
-  HomeBloc(this.repository);
+  HomeBloc(this.repository, this.appBloc);
 
   @override
   HomeState get initialState => HomeStateInitial();
@@ -64,6 +71,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
     try {
+      if (event is HomeEventRemoveData) {
+        yield HomeStateLoading();
+        // remove data if exist
+        await repository.removeData();
+        yield HomeStateLocalNotExists();
+      }
+
       if (event is HomeEventStartup) {
         // check start up
         yield HomeStateLoading();
@@ -80,6 +94,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (event is HomeEventDownloadOffline) {
         await repository.downloadFile(event.url);
         await repository.extractOffline();
+        appBloc.add(AppEventMessage('Offline data downloaded'));
       }
     } catch (err) {
       yield HomeStateError(err.toString());

@@ -1,6 +1,8 @@
+import 'package:ai_touch_10_days/app.bloc.dart';
 import 'package:ai_touch_10_days/home/Home.widget.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class App extends StatelessWidget {
   @override
@@ -15,7 +17,8 @@ class App extends StatelessWidget {
           return MaterialApp(
             title: 'Flutter Demo',
             theme: theme,
-            home: HomeWidget(),
+            home: BlocProvider<AppBloc>(
+                builder: (context) => AppBloc(), child: HomeWidget()),
           );
         });
   }
