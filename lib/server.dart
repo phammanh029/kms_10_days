@@ -23,15 +23,17 @@ class Server {
     _database =
         await databaseFactoryIo.openDatabase('${await _localPath}/lms.db');
     final tincan = Tincan();
-    tincan.initialize({'url': 'https://google.com'});
+    tincan.initialize({'url': 'https://myworkspace.vn/xapi/thachln/'});
     // var store = intMapStoreFactory.store('tracking');
-    var store = StoreRef.main();
+    // var store = StoreRef.main();
     // open database connection
-    _server.listen((request) {
+    _server.listen((request) async {
+      print(request.uri.toString());
       // put to android 
       tincan.enqueueStatement(Statement());
       request.response.write('ok');
-      request.response.close();
+      await request.response.flush();
+      await request.response.close();
     });
   }
 

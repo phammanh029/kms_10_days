@@ -68,8 +68,8 @@ class Repository {
     await file.writeAsString(content.replaceAll(
         'endPoint: "https://myworkspace.vn/xapi/thachln/"',
         //endPoint:\s*"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
-        // 'endPoint: "http://localhost:9000/"'
-        'endPoint: ((url)=> {let rs = /host=([^&]*)/.exec(url);  return rs && rs[1];})("http://localhost:9000/?host=https://myworkspace.vn/xapi/thachln/")||"https://myworkspace.vn/xapi/thachln/"'));
+        'endPoint: "http://${InternetAddress.loopbackIPv4.host}:9000/"'));
+        // 'endPoint: `http://localhost:9000/?host=\${((url)=> {let rs = /host=([^&]*)/.exec(url);  return rs && rs[1];})("https://myworkspace.vn/xapi/thachln/")||"https://myworkspace.vn/xapi/thachln/"}`'));
   }
 
   Future<String> loadOfflineContent() async {
