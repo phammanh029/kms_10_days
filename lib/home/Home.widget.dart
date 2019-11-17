@@ -14,9 +14,9 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   HomeBloc _bloc;
   static const endpoint =
-      'https://myworkspace.vn/ebooks/touch-ai-draft-day-01-free';
+      'https://myworkspace.vn/ebooks/touch-ai-draft-day-01-free/';
   static const downloadLink =
-      'https://myworkspace.vn/ebooks/ebooks-touch-ai-free-19-pages.zip';
+      'https://myworkspace.vn/ebooks/touch-ai-draft-day-01-free/touch-ai-draft-day-01-free-offline.zip';
   @override
   void initState() {
     super.initState();
@@ -48,6 +48,21 @@ class _HomeWidgetState extends State<HomeWidget> {
                         child: const CircularProgressIndicator());
                   }
 
+                  if (state is HomeStateError) {
+                    return Column(
+                      children: <Widget>[
+                        FlatButton.icon(
+                            icon: const Icon(Icons.delete),
+                            label: const Text('Delete data'),
+                            onPressed: () {
+                              // do download
+                              _bloc.add(HomeEventRemoveData());
+                            }),
+                        Text(state.error ?? 'Something went wrong')
+                      ]
+                    );
+                  }
+
                   if (state is HomeStateLocalNotExists) {
                     return CustomScrollView(slivers: <Widget>[
                       SliverAppBar(
@@ -73,29 +88,33 @@ class _HomeWidgetState extends State<HomeWidget> {
                   }
 
                   if (state is HomeStateOfflineContentLoaded) {
-                    return CustomScrollView(slivers: <Widget>[
-                      SliverAppBar(
-                          floating: true,
-                          pinned: false,
-                          snap: false,
-                          actions: <Widget>[
-                            FlatButton.icon(
-                                icon: const Icon(Icons.delete),
-                                label: const Text('Delete data'),
-                                onPressed: () {
-                                  // do download
-                                  _bloc.add(HomeEventRemoveData());
-                                })
-                          ]),
-                      SliverFillRemaining(
-                          child: Builder(
-                              builder: (context) => WebView(
-                                  javascriptMode: JavascriptMode.unrestricted,
-                                  initialUrl: 'file:///${state.content}')))
-                    ]);
+                    return _buildOfflineWidget(state);
                   }
 
                   return const Center(child: const Text('Initializing . . .'));
                 })));
+  }
+
+  CustomScrollView _buildOfflineWidget(HomeStateOfflineContentLoaded state) {
+    return CustomScrollView(slivers: <Widget>[
+      SliverAppBar(
+          floating: true,
+          pinned: false,
+          snap: false,
+          actions: <Widget>[
+            FlatButton.icon(
+                icon: const Icon(Icons.delete),
+                label: const Text('Delete data'),
+                onPressed: () {
+                  // do download
+                  _bloc.add(HomeEventRemoveData());
+                })
+          ]),
+      SliverFillRemaining(
+          child: Builder(
+              builder: (context) => WebView(
+                  javascriptMode: JavascriptMode.unrestricted,
+                  initialUrl: 'file:///${state.content}')))
+    ]);
   }
 }

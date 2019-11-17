@@ -1,5 +1,6 @@
 import 'package:ai_touch_10_days/app.bloc.dart';
 import 'package:ai_touch_10_days/repository/Repository.dart';
+import 'package:ai_touch_10_days/server.dart';
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
 
@@ -62,6 +63,7 @@ class HomeStateError extends HomeState {
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final Repository repository;
   final AppBloc appBloc;
+  Server _server;
 
   HomeBloc(this.repository, this.appBloc);
 
@@ -86,6 +88,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           // do download
           yield HomeStateOfflineContentLoaded(
               await repository.loadOfflineContent());
+          // start server
+          _server = Server();
+          // listen server on port 9000
+          _server.listen(9000);
         } else {
           yield HomeStateLocalNotExists();
         }
